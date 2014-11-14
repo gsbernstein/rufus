@@ -50,7 +50,4 @@ module.exports = (robot) ->
           baseUrl.replace /\/api\/v3/, ''
         else 'https://github.com'
 
-        issueNumberStr = String issueNumber
-        pad = 7 - issueNumberStr.length
-        for i in [0...pad] then issueNumberStr += ' '
-        msg.send "`##{issueNumberStr}`*#{issueTitle}* #{url}/#{repo}/issues/#{issueNumber}"
+        msg.send "*##{issueNumber}* #{issueTitle} #{url}/#{repo}/issues/#{issueNumber}"
