@@ -50,4 +50,4 @@ module.exports = (robot) ->
           baseUrl.replace /\/api\/v3/, ''
         else 'https://github.com'
 
-        msg.send "*##{issueNumber}* #{issueTitle} #{url}/#{repo}/issues/#{issueNumber}"
+        msg.send "*##{issueNumber}* — #{issueTitle} #{url}/#{repo}/issues/#{issueNumber}"
