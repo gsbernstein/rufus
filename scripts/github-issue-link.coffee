@@ -20,35 +20,33 @@
 # Notes:
 #   HUBOT_GITHUB_API allows you to set a custom URL path (for Github enterprise users)
 #
-# Author:
-#   tenfef
+# Derived from https://github.com/github/hubot-scripts/blob/master/src/scripts/github-issue-link.coffee
 
 module.exports = (robot) ->
   github = require("githubot")(robot)
 
-  githubIgnoreUsers = process.env.HUBOT_GITHUB_ISSUE_LINK_IGNORE_USERS
-  if githubIgnoreUsers == undefined
-    githubIgnoreUsers = "github|hubot"
+  githubIgnoreUsers = \
+    process.env.HUBOT_GITHUB_ISSUE_LINK_IGNORE_USERS or 'github|hubot'
 
   robot.hear /((\S*|^)?#(\d+)).*/, (msg) ->
-    return if msg.message.user.name.match(new RegExp(githubIgnoreUsers, "gi"))
+    return if msg.message.user.name.match new RegExp githubIgnoreUsers, 'gi'
 
-    issue_number = msg.match[3]
-    if isNaN(issue_number)
-      return
+    r = /((\S*|^)?#(\d+))/g
+    while match = r.exec msg.message then do (match) ->
 
-    if msg.match[2] == undefined
-      bot_github_repo = github.qualified_repo process.env.HUBOT_GITHUB_REPO
-    else
-      bot_github_repo = github.qualified_repo msg.match[2]
+      issueNumber = match[3]
+      return if isNaN issueNumber
 
-    issue_title = ""
-    base_url = process.env.HUBOT_GITHUB_API || 'https://api.github.com'
+      if match[2] is undefined
+        repo = github.qualified_repo process.env.HUBOT_GITHUB_REPO
+      else
+        repo = github.qualified_repo match[2]
 
-    github.get "#{base_url}/repos/#{bot_github_repo}/issues/" + issue_number, (issue_obj) ->
-      issue_title = issue_obj.title
-      unless process.env.HUBOT_GITHUB_API
-         url = "https://github.com"
-       else
-         url = base_url.replace /\/api\/v3/, ''
-       msg.send "Issue #{issue_number}: #{issue_title} #{url}/#{bot_github_repo}/issues/#{issue_number}"
+      baseUrl = process.env.HUBOT_GITHUB_API or 'https://api.github.com'
+
+      github.get "#{baseUrl}/repos/#{repo}/issues/#{issueNumber}", (issue_obj) ->
+        issueTitle = issue_obj.title
+        url = if process.env.HUBOT_GITHUB_API
+          baseUrl.replace /\/api\/v3/, ''
+        else 'https://github.com'
+        msg.send "##{issueNumber}: #{issueTitle} #{url}/#{repo}/issues/#{issueNumber}"
