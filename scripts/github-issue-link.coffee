@@ -49,4 +49,8 @@ module.exports = (robot) ->
         url = if process.env.HUBOT_GITHUB_API
           baseUrl.replace /\/api\/v3/, ''
         else 'https://github.com'
-        msg.send "#{repo}##{issueNumber} *#{issueTitle}* #{url}/#{repo}/issues/#{issueNumber}"
+
+        issueNumberStr = String issueNumber
+        pad = 7 - issueNumberStr.length
+        for i in [0...pad] then issueNumberStr += ' '
+        msg.send "`##{issueNumberStr}`*#{issueTitle}* #{url}/#{repo}/issues/#{issueNumber}"
